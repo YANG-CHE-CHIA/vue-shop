@@ -1,12 +1,11 @@
 <script setup>
     import { ref } from 'vue'
-    import { login } from '@/api/manager'
+    import { login, getUserInfo } from '@/api/manager'
     import { useRouter } from 'vue-router'
-    import { useCookies } from '@vueuse/integrations/useCookies'
-    import { ElNotification } from 'element-plus'
+    import { toast } from '@/composables/util'
+    import { setToken } from '@/composables/auth'
 
     const router = useRouter()
-    const cookies = useCookies()
 
     const formData = ref({
         username: '',
@@ -14,7 +13,7 @@
     })
 
     const formRef = ref(null)
-    const errorMessage = ref('')
+    const loading = ref(false)
 
     const rules = {
         username: [
@@ -29,32 +28,29 @@
         formRef.value.validate(async (valid) => {
             if (valid) {
                 try {
-                    errorMessage.value = ''
+                    loading.value = true
                     const res = await login(formData.value.username, formData.value.password)
-
                     //請求成功
-                    ElNotification({
-                        message: '登入成功',
-                        type: 'success',
-                        duration: 2000
-                    })
+                    toast('登入成功', 'success');
 
                     //把token存到cookie中
-                    cookies.set('token', res.data.data.token)
-                    
+                    setToken(res.token)
+
+                    //獲取用戶訊息
+                    const userInfo = await getUserInfo()
+                    console.log(userInfo)
+
                     //跳轉到後台首頁
                     router.push('/')
-
-                } catch (error) {
-                    //請求失敗
-                    errorMessage.value = error?.response?.data?.msg || '請求失敗'
-                    ElNotification({
-                        message: errorMessage.value,
-                        type: 'error',
-                        duration: 2000
-                    })
+                } 
+                catch (error) {
+                    //console.error(error)
                 }
-            } else {
+                finally {
+                    loading.value = false 
+                }
+            } 
+            else {
                 return false
             }
         })
@@ -93,7 +89,7 @@
                     </el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button class="from_btn" type="primary" @click="SubmitHandler">登入</el-button>
+                    <el-button class="from_btn" type="primary" @click="SubmitHandler" :loading="loading">登入</el-button>
                 </el-form-item>
             </el-form>
         </el-col>
