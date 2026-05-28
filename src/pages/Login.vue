@@ -1,11 +1,11 @@
 <script setup>
-    import { ref } from 'vue'
-    import { login, getUserInfo } from '@/api/manager'
+    import { ref, onMounted, onBeforeUnmount } from 'vue'
+    import { toast } from '@/composables/util'    
     import { useRouter } from 'vue-router'
-    import { toast } from '@/composables/util'
-    import { setToken } from '@/composables/auth'
-
+    import { useUserStore } from '@/stores/useUserStore'
+    
     const router = useRouter()
+    const userStore = useUserStore()
 
     const formData = ref({
         username: '',
@@ -29,16 +29,10 @@
             if (valid) {
                 try {
                     loading.value = true
-                    const res = await login(formData.value.username, formData.value.password)
+
+                    await userStore.loginInfo(formData.value.username, formData.value.password) 
                     //請求成功
                     toast('登入成功', 'success');
-
-                    //把token存到cookie中
-                    setToken(res.token)
-
-                    //獲取用戶訊息
-                    const userInfo = await getUserInfo()
-                    console.log(userInfo)
 
                     //跳轉到後台首頁
                     router.push('/')
@@ -55,6 +49,20 @@
             }
         })
     }
+
+    //監聽鍵盤事件
+    const onKeyUp = (e) =>{
+       if(e.key == "Enter") SubmitHandler()
+    }
+
+    onMounted(()=>{
+        document.addEventListener('keyup',onKeyUp)
+    })
+
+    onBeforeUnmount(() =>{
+        document.removeEventListener('keyup',onKeyUp)
+    })
+
 </script>
 
 <template>

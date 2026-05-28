@@ -24,3 +24,15 @@ export const getUserInfo = async () => {
     throw error 
   } 
 }
+
+//登出
+export const logoutInfo = async() =>{
+  try {
+    const res = await axios.post('/admin/logout')
+    return res 
+  } 
+  catch (error) {
+
+    throw error 
+  } 
+}

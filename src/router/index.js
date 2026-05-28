@@ -8,7 +8,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'ndex',
+      name: 'Index',
       component: Index,
     },
     {
