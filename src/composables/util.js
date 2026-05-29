@@ -1,4 +1,5 @@
 import { ElNotification, ElMessageBox } from 'element-plus'
+import nprogress from 'nprogress'
 
 
 // 消息提示
@@ -22,4 +23,14 @@ export function showModal(content, type, title) {
       type: type,
     }
   )
+}
+
+//顯示Loading
+export function showFullLoading() {
+  nprogress.start()
+}
+
+//關閉Loading
+export function hideFullLoading() {
+  nprogress.done()
 }

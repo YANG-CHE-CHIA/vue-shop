@@ -1,9 +1,12 @@
 import router from "@/router";
 import { getToken } from "@/composables/auth";
-import { toast } from "@/composables/util";
+import { toast, showFullLoading, hideFullLoading } from "@/composables/util";
 import { useUserStore } from '@/stores/useUserStore'
 
 router.beforeEach(async (to, from, next) => {
+
+    //顯示loading
+    showFullLoading()
 
     const token = getToken()
     const userStore = useUserStore()
@@ -32,3 +35,6 @@ router.beforeEach(async (to, from, next) => {
 
     next()
 })
+
+
+router.afterEach((to, from) => hideFullLoading())

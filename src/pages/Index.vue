@@ -8,11 +8,8 @@ const router = useRouter()
 
 const logoutHandler = async () => {
   try {
-    // 1. 這裡會卡住，等待使用者操作
-    // 如果點「確定」：Promise 成功 (resolve)，程式繼續往下走第 2 步
     await showModal('是否要登出', 'warning', '')
     
-    // 2. 執行登出
     await userStore.logoutInfo()
 
   } catch (error) {
