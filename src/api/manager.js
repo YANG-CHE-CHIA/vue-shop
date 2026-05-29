@@ -36,3 +36,15 @@ export const logoutInfo = async() =>{
     throw error 
   } 
 }
+
+//修改密碼
+export const updatepassword = async(data) =>{
+  try {
+    const res = await axios.post('/admin/updatepassword',data)
+    return res 
+  } 
+  catch (error) {
+
+    throw error 
+  } 
+}

@@ -25,7 +25,8 @@ service.interceptors.response.use(response => {
     return response.data.data
 }, 
 error => {
-    errorMessage.value = error?.response?.data?.msg || '請求失敗'
+    const msg = error?.response?.data?.msg || '請求失敗'
+    errorMessage.value = msg
 
     toast(errorMessage.value, 'error');
 

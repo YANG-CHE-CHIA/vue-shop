@@ -3,7 +3,7 @@ import { getToken } from "@/composables/auth";
 import { toast, showFullLoading, hideFullLoading } from "@/composables/util";
 import { useUserStore } from '@/stores/useUserStore'
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, from) => {
 
     //顯示loading
     showFullLoading()
@@ -14,13 +14,15 @@ router.beforeEach(async (to, from, next) => {
     //沒有登入的話,就回到登入頁面
     if (to.path !== '/login' && !token) {
         toast('請先登入', 'error')
-        return next('/login')
+        hideFullLoading()
+        return '/login'
     }
 
     //防止重複登入
     if (token && to.path == '/login') {
         toast('請勿重複登入', 'error')
-        return next(from.path || '/')
+        hideFullLoading()
+        return from.path || '/'
     }
 
     //如果用戶登入,就自動取得用戶訊息,並存在pinia當中
@@ -29,11 +31,15 @@ router.beforeEach(async (to, from, next) => {
             await userStore.getInfo() 
         } catch (error) {
             toast('登入狀態失效，請重新登入', 'error')
-            return next('/login')
+            return '/login'
         }
     }
 
-    next()
+    //設定頁面標題
+    const title = (to.meta.title ? to.meta.title : "") 
+    document.title = title
+
+    return true
 })
 
 

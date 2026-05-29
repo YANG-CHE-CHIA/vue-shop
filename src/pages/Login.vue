@@ -105,7 +105,7 @@
     </el-row>
 </template>
 
-<style>
+<style scoped>
     .d-flex {
         display: flex;
         align-items: center;
