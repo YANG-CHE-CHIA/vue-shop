@@ -6,12 +6,16 @@ import { setToken, removeToken } from '@/composables/auth'
 export const useUserStore = defineStore('user', () => {
 
     const user = ref({})
+    const menus = ref([])
+    const ruleNames = ref([])
 
     //取得當前用戶訊息
     const getInfo = async () => {
         try {
             const res = await getUserInfo()
             user.value = res
+            menus.value = res.menus
+            ruleNames.value = res.ruleNames
             return res
         } catch (error) {
             throw error
@@ -47,5 +51,5 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
-    return { user, getInfo, loginInfo, logoutInfo }
+    return { user, menus, ruleNames, getInfo, loginInfo, logoutInfo }
 })

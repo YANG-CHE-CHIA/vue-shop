@@ -1,4 +1,4 @@
-import router from "@/router";
+import { router, addRoutes } from "@/router";
 import { getToken } from "@/composables/auth";
 import { toast, showFullLoading, hideFullLoading } from "@/composables/util";
 import { useUserStore } from '@/stores/useUserStore'
@@ -26,9 +26,13 @@ router.beforeEach(async (to, from) => {
     }
 
     //如果用戶登入,就自動取得用戶訊息,並存在pinia當中
+    let hasNewRoutes = false
     if (token && !userStore.user.id) {
         try {
-            await userStore.getInfo() 
+            let res = await userStore.getInfo() 
+            //動態添加路由
+            hasNewRoutes = addRoutes(res.menus)
+
         } catch (error) {
             toast('登入狀態失效，請重新登入', 'error')
             return '/login'
@@ -39,7 +43,7 @@ router.beforeEach(async (to, from) => {
     const title = (to.meta.title ? to.meta.title : "") 
     document.title = title
 
-    return true
+    return hasNewRoutes ? to.fullPath : true
 })
 
 

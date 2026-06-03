@@ -2,6 +2,10 @@
     import Header from './components/Header.vue'
     import Menu from './components/Menu.vue'
     import TagList from './components/TagList.vue'
+    import { useAsideStore } from '@/stores/useAsideStore'
+
+    const AsideStore = useAsideStore()
+
 </script>>
 
 <template>
@@ -10,7 +14,7 @@
             <Header/>
         </el-header>
         <el-container>
-            <el-aside>
+            <el-aside :width="AsideStore.asideWidth">
                 <Menu/>
             </el-aside>
             <el-main>
@@ -20,3 +24,9 @@
         </el-container>
     </el-container>
 </template>
+
+<style scoped>
+    .el-aside{
+        transition: all 0.3s ease;
+    }
+</style>

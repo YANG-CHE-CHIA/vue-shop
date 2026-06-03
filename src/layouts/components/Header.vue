@@ -3,13 +3,15 @@ import { useFullscreen } from '@vueuse/core'
 import FormDrawer from '@/components/FormDrawer.vue'
 import { useRepassword, useLogout } from '@/composables/useManager'
 import { useUserStore } from '@/stores/useUserStore'
+import { useAsideStore } from '@/stores/useAsideStore'
 
 const { isFullscreen, toggle } = useFullscreen()
 const { formDrawerRef, formData, formRef, rules, SubmitHandler, openRepasswordFrom } = useRepassword()
 const { logoutHandler } = useLogout()
 
-
 const userStore = useUserStore()
+const AsideStore = useAsideStore()
+
 
 const CommandHandler = (c) => {
     switch (c) {
@@ -44,8 +46,9 @@ const RefreshHandler = () => {
                 </span>
             </div>
             <div class="icon_item">
-                <el-icon class="icon">
-                    <Fold />
+                <el-icon class="icon" @click="AsideStore.AsideWidthHandler">
+                    <Fold v-if="AsideStore.asideWidth === '250px'" />
+                    <Expand v-else />
                 </el-icon>
                 <el-tooltip effect="dark" content="刷新" placement="bottom">
                     <el-icon class="icon" @click="RefreshHandler">
