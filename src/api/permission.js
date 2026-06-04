@@ -3,6 +3,8 @@ import { getToken } from "@/composables/auth";
 import { toast, showFullLoading, hideFullLoading } from "@/composables/util";
 import { useUserStore } from '@/stores/useUserStore'
 
+let hasGetInfo = false
+
 router.beforeEach(async (to, from) => {
 
     //顯示loading
@@ -27,11 +29,12 @@ router.beforeEach(async (to, from) => {
 
     //如果用戶登入,就自動取得用戶訊息,並存在pinia當中
     let hasNewRoutes = false
-    if (token && !userStore.user.id) {
+    if (token && !userStore.user.id && !hasGetInfo) {
         try {
             let res = await userStore.getInfo() 
             //動態添加路由
             hasNewRoutes = addRoutes(res.menus)
+            hasGetInfo = true
 
         } catch (error) {
             toast('登入狀態失效，請重新登入', 'error')
