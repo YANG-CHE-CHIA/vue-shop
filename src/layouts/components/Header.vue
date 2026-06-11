@@ -111,6 +111,7 @@ const RefreshHandler = () => {
     left: 0;
     right: 0;
     padding: 0 15px;
+    z-index: 1000;
 }
 
 .left_item {
