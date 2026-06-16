@@ -31,6 +31,7 @@ const rules = {
     ],
 }
 
+//讀取資料
 const getData = async (p = null) => {
     try {
         if (typeof p == "number") {
@@ -57,6 +58,7 @@ const getData = async (p = null) => {
     }
 }
 
+//資料送出
 const SubmitHandler = () => {
     formRef.value.validate(async (valid) => {
         if (!valid) return
