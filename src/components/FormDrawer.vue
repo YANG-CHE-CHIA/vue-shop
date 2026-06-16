@@ -46,7 +46,7 @@ const submitHandler = () =>{
             </div>
             <div class="actions">
                 <el-button type="primary" @click="submitHandler" :loading="loading">{{ confirmText }}</el-button>
-                <el-button type="default">取消</el-button>
+                <el-button type="default" @click="close">取消</el-button>
             </div>
         </div>
     </el-drawer>
