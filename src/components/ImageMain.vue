@@ -1,8 +1,7 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { getImageList, updateImage, deleteImage } from '@/api/image.js'
 import { toast, showPrompt } from '@/composables/util.js'
-
 import UploadFile from '@/components/UploadFile.vue'
 
 //分頁
@@ -17,6 +16,7 @@ const image_class_id = ref(0)
 //上傳圖片
 const drawer = ref(false)
 
+//讀取資料
 const getData = async (p = null) => {
     try {
         if (typeof p == "number") {
@@ -27,7 +27,10 @@ const getData = async (p = null) => {
         const res = await getImageList(image_class_id.value, currentPage.value);
 
         if (res) {
-            list.value = res.list
+            list.value = res.list.map(o=>{
+                o.checked = false
+                return o
+            })
             total.value = res.totalCount
         }
 
@@ -88,6 +91,25 @@ const openUploadFile = () => drawer.value = true
 //上傳成功
 const UploadSuccessHandler = () => getData(1)
 
+defineProps({
+    openChoose:{
+        type:Boolean,
+        default:false
+    }
+})
+
+//選中的圖片
+const emit = defineEmits(['choose'])
+const checkedImage = computed(()=> list.value.filter(o=>o.checked))
+
+const ChooseChangeHandler = (item) =>{
+    if(item.checked && checkedImage.value.length > 1){
+        item.checked = false
+        return toast('最多只可以選一張圖片','error')
+    }
+    emit('choose',checkedImage.value)
+}
+
 //像父組件傳遞方法
 defineExpose({
     loadData,
@@ -106,6 +128,9 @@ defineExpose({
                             :initial-index="0"></el-image>
                         <div class="pic_title">{{ item.name }}</div>
                         <div class="d-flex btn_item">
+
+                            <el-checkbox v-if="openChoose" v-model="item.checked" @change="ChooseChangeHandler(item)" />
+                            
                             <el-button text type="primary" size="small" @click="EditHandler(item)">重新命名</el-button>
                             <el-popconfirm title="是否要刪除" confirmButtonText="確認" cancelButtonText="取消"
                                 @confirm="DeleteHandler(item.id)">

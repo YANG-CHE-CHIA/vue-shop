@@ -83,6 +83,12 @@ const asyncRoutes = [
     name: 'CouponList',
     component: () => import('@/pages/coupon/list.vue'),
     meta: { title: "優惠券列表" }
+  },
+  {
+    path: '/manager/list',
+    name: 'Manager',
+    component: () => import('@/pages/manager/list.vue'),
+    meta: { title: "管理員管理" }
   }
 ]
 

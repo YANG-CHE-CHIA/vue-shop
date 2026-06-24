@@ -14,37 +14,25 @@ export const login = async (username, password) => {
 }
 
 //獲取用戶信息
-export const getUserInfo = async () => {
-  try {
-    const res = await axios.post('/admin/getinfo')
-    return res 
-  } 
-  catch (error) {
-
-    throw error 
-  } 
-}
+export const getUserInfo = () => axios.post('/admin/getinfo');
 
 //登出
-export const logoutInfo = async() =>{
-  try {
-    const res = await axios.post('/admin/logout')
-    return res 
-  } 
-  catch (error) {
-
-    throw error 
-  } 
-}
+export const logoutInfo = () => axios.post('/admin/logout');
 
 //修改密碼
-export const updatepassword = async(data) =>{
-  try {
-    const res = await axios.post('/admin/updatepassword',data)
-    return res 
-  } 
-  catch (error) {
+export const updatepassword = (data) => axios.post('/admin/updatepassword',data);
 
-    throw error 
-  } 
-}
+//管理員資訊
+export const getManagerList = (page, params = { }) => axios.get(`/admin/manager/${page}`, { params });
+
+//管理員狀態
+export const updateManagerStatus = (id,status) => axios.post(`/admin/manager/${id}/update_status`,{ status });
+
+//管理員新增
+export const createManager = (data) => axios.post(`/admin/manager`,data);
+
+//管理員修改
+export const updateManager = (id,data) => axios.post(`/admin/manager/${id}`,data);
+
+//管理員刪除
+export const deleteManager = (id) => axios.post(`/admin/manager/${id}/delete`);
