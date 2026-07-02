@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { getManagerList, updateManagerStatus, createManager, updateManager, deleteManager } from '@/api/manager.js'
 import FormDrawer from '@/components/FormDrawer.vue'
 import ChooseImage from '@/components/ChooseImage.vue'
+import ListHeader from '@/components/ListHeader.vue'
 import { useInitTable, useInitForm } from '@/composables/useCommon.js'
 
 const { searchForm, resetSearchFrom, tableData, loading, currentPage, total, limit, getData, DeleteHanlder, StatusChangeHandler }
@@ -54,17 +55,8 @@ const roles = ref([])
             </el-form-item>
         </el-form>
 
-        <!-- 新增按鈕 -->
-        <div class="d-flex">
-            <el-button type="primary" size="small" @click="CreateHandler">新增</el-button>
-            <el-tooltip effect="dark" content="刷新" placement="top">
-                <el-button text @click="getData">
-                    <el-icon :size="20">
-                        <Refresh />
-                    </el-icon>
-                </el-button>
-            </el-tooltip>
-        </div>
+        <!-- 新增和刷新 -->
+        <ListHeader @create="CreateHandler" @refresh="getData" />
 
         <!-- 資料 -->
         <el-table :data="tableData" stripe style="width: 100%" v-loading="loading">

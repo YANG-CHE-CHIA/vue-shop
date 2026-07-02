@@ -89,6 +89,12 @@ const asyncRoutes = [
     name: 'Manager',
     component: () => import('@/pages/manager/list.vue'),
     meta: { title: "管理員管理" }
+  },
+  {
+    path: '/access/list',
+    name: 'Access',
+    component: () => import('@/pages/access/list.vue'),
+    meta: { title: "菜單權限管理" }
   }
 ]
 
@@ -105,16 +111,16 @@ export function addRoutes(menus) {
     arr.forEach(e => {
       // 特殊處理後台首頁的對應關係
       const targetPath = e.frontpath === '/' ? '' : e.frontpath
-      
+
       // 依據 path 尋找對應的本機路由設定
       let item = asyncRoutes.find(o => o.path === targetPath)
-      
+
       // 💡 安全檢查：確保找到該路由，且該路由的 name 尚未被註冊過
       if (item && !router.hasRoute(item.name)) {
         router.addRoute("admin", item)
         hasNewRoutes = true
       }
-      
+
       // 遞迴處理子選單
       if (e.child && e.child.length > 0) {
         findAndAddRoutes(e.child)

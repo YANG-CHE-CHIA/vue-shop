@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router'
 import { useUserStore } from '@/stores/useUserStore'
 import { useAsideStore } from '@/stores/useAsideStore'
 
@@ -11,6 +11,11 @@ const AsideStore = useAsideStore()
 
 //當前選中的選單
 const defaultActive = ref(route.path)
+
+//監聽路由變化
+onBeforeRouteUpdate((to,from)=>{
+    defaultActive.value = to.path
+})
 
 //選單是否摺疊
 const isCollapse = computed(() => AsideStore.asideWidth === '64px')

@@ -1,5 +1,6 @@
 <script setup>
 import FormDrawer from '@/components/FormDrawer.vue'
+import ListHeader from '@/components/ListHeader.vue'
 import { getNoticeList, createNotice, updateNotice, deleteNotice } from '@/api/notice.js'
 import { useInitTable, useInitForm } from '@/composables/useCommon.js'
 const { tableData, loading, currentPage, total, limit, getData, DeleteHanlder } 
@@ -27,17 +28,8 @@ const { formDrawerRef, formRef, form, rules, drawerTitle, SubmitHandler, CreateH
 
 <template>
     <el-card shadow="never" class="info">
-        <!-- 新增 -->
-        <div class="d-flex">
-            <el-button type="primary" size="small" @click="CreateHandler">新增</el-button>
-            <el-tooltip effect="dark" content="刷新" placement="top">
-                <el-button text @click="getData">
-                    <el-icon :size="20">
-                        <Refresh />
-                    </el-icon>
-                </el-button>
-            </el-tooltip>
-        </div>
+        <!-- 新增和刷新 -->
+        <ListHeader @create="CreateHandler" @refresh="getData" />
 
         <!-- 資料 -->
         <el-table :data="tableData" stripe style="width: 100%" v-loading="loading">
