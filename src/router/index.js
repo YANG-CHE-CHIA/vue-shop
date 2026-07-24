@@ -96,6 +96,13 @@ const asyncRoutes = [
     component: () => import('@/pages/access/list.vue'),
     meta: { title: "菜單權限管理" }
   }
+  ,
+  {
+    path: '/role/list',
+    name: 'Role',
+    component: () => import('@/pages/role/list.vue'),
+    meta: { title: "角色管理" }
+  }
 ]
 
 export const router = createRouter({
