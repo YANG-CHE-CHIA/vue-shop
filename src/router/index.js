@@ -103,6 +103,13 @@ const asyncRoutes = [
     component: () => import('@/pages/role/list.vue'),
     meta: { title: "角色管理" }
   }
+  ,
+  {
+    path: '/skus/list',
+    name: 'Skus',
+    component: () => import('@/pages/skus/list.vue'),
+    meta: { title: "規格管理" }
+  }
 ]
 
 export const router = createRouter({

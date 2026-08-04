@@ -86,8 +86,34 @@ export function useInitTable(opt = {}) {
         }
     }
 
+    // 多選選中的ID
+    const multiSelectionsIds = ref([])
+    const SelectionChangeHandler = (e) => {
+        multiSelectionsIds.value = e.map(item => item.id)
+    }
 
-    return { searchForm, resetSearchFrom, tableData, loading, currentPage, total, limit, getData, DeleteHanlder, StatusChangeHandler }
+    // 批量刪除
+    const multipleTableRef = ref(null)
+    const MultiDeleteHandler = async () => {
+        loading.value = true
+        try {
+            await opt.delete(multiSelectionsIds.value)
+            toast("刪除成功", "success")
+            if (multipleTableRef.value) {
+                multipleTableRef.value.clearSelection()
+            }
+            getData()
+
+        } catch (error) {
+            console.error('發生錯誤：', error);
+        }
+        finally {
+            loading.value = false
+        }
+    }
+
+
+    return { searchForm, resetSearchFrom, tableData, loading, currentPage, total, limit, getData, DeleteHanlder, StatusChangeHandler, SelectionChangeHandler, multipleTableRef, MultiDeleteHandler }
 }
 
 // 封裝新增,修改
