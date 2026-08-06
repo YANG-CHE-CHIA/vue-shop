@@ -133,7 +133,16 @@ export function useInitForm(opt = {}) {
             if (valid) {
                 try {
                     formDrawerRef.value.showLoading()
-                    const res = editId.value ? await opt.update(editId.value, form) : await opt.create(form)
+
+                    let body_text = {}
+                    if(opt.beforeSubmit && typeof opt.beforeSubmit == 'function'){
+                        body_text = await opt.beforeSubmit({ ...form })
+                    }
+                    else{
+                        body_text = form
+                    }
+
+                    const res = editId.value ? await opt.update(editId.value, body_text) : await opt.create(body_text)
                     if (res) {
                         toast(drawerTitle.value + '成功', 'success')
                         opt.getData(editId.value ? false : 1)
