@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import { getManagerList, updateManagerStatus, createManager, updateManager, deleteManager } from '@/api/manager.js'
 import FormDrawer from '@/components/FormDrawer.vue'
 import ChooseImage from '@/components/ChooseImage.vue'
+import Search from '@/components/Search.vue'
+import SearchItem from '@/components/SearchItem.vue'
 import ListHeader from '@/components/ListHeader.vue'
 import { useInitTable, useInitForm } from '@/composables/useCommon.js'
 
@@ -45,15 +47,13 @@ const roles = ref([])
 <template>
     <el-card shadow="never" class="info">
         <!-- 搜尋 -->
-        <el-form :model="searchForm" label-width="80px" class="search_item">
-            <el-form-item label="關鍵字">
+        <Search :model="searchForm" @search="getData" @reset="resetSearchFrom">
+            <SearchItem label="關鍵字">
+                <!-- <el-input v-model="searchForm.title" placeholder="商品名稱" clearable></el-input> -->
                 <el-input v-model="searchForm.keyword" placeholder="管理員名稱" clearable></el-input>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="getData">搜尋</el-button>
-                <el-button @click="resetSearchFrom">重置</el-button>
-            </el-form-item>
-        </el-form>
+            </SearchItem>
+        </Search>
+
 
         <!-- 新增和刷新 -->
         <ListHeader @create="CreateHandler" @refresh="getData" />
