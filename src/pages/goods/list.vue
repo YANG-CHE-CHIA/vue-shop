@@ -2,14 +2,17 @@
 import { ref } from 'vue'
 import { getGoodsList, updateGoodsStatus, createGoods, updateGoods, deleteGoods } from '@/api/goods.js'
 import { getCategoryList } from '@/api/category.js'
+import { useInitTable, useInitForm } from '@/composables/useCommon.js'
 import FormDrawer from '@/components/FormDrawer.vue'
 import ChooseImage from '@/components/ChooseImage.vue'
 import Search from '@/components/Search.vue'
 import SearchItem from '@/components/SearchItem.vue'
 import ListHeader from '@/components/ListHeader.vue'
-import { useInitTable, useInitForm } from '@/composables/useCommon.js'
+import Banners from './banners.vue'
+import Content from './content.vue'
 
-const { searchForm, resetSearchFrom, tableData, loading, currentPage, total, limit, getData, DeleteHanlder, StatusChangeHandler }
+const { searchForm, resetSearchFrom, tableData, loading, currentPage, total, limit, getData, DeleteHanlder, 
+    SelectionChangeHandler, multipleTableRef, MultiDeleteHandler, MultiStatusChangeHandler }
     = useInitTable({
         searchForm: {
             title: '',
@@ -19,11 +22,11 @@ const { searchForm, resetSearchFrom, tableData, loading, currentPage, total, lim
         getList: getGoodsList,
         onGetListSuccess: (res) => {
             tableData.value = res.list.map(o => {
-                o.statusLoading = false
+                o.bannersLoading = false
+                o.contentLoading = false
                 return o
             })
             total.value = res.totalCount
-            roles.value = res.roles
         },
         delete: deleteGoods,
         updateStatus: updateGoodsStatus
@@ -32,18 +35,23 @@ const { searchForm, resetSearchFrom, tableData, loading, currentPage, total, lim
 const { formDrawerRef, formRef, form, rules, drawerTitle, SubmitHandler, CreateHandler, UpdateHanlder }
     = useInitForm({
         form: {
-            username: "",
-            password: "",
-            role_id: null,
+            title: null,
+            category_id: null,
+            cover: null,
+            desc: null,
+            unit: "件",
+            stock: 100,
+            min_stock: 10,
             status: 1,
-            avatar: ""
+            stock_display: 1,
+            min_price: 0,
+            min_oprice: 0
         },
         getData,
         update: updateGoods,
         create: createGoods
     })
 
-const roles = ref([])
 
 //tab選單
 const tabbars = [
@@ -85,10 +93,19 @@ const fetchCategoryList = async () => {
     }
 }
 
-
-
-// 呼叫函式執行
 fetchCategoryList()
+
+//設置輪播圖
+const bannersRef = ref(null)
+const SetGoodsBannersHandler = (item) =>{
+    bannersRef.value.open(item)
+}
+
+//商品詳情
+const contentRef = ref(null)
+const SetGoodsContentHandler = (item) =>{
+    contentRef.value.open(item)
+}
 
 </script>
 
@@ -115,10 +132,16 @@ fetchCategoryList()
             </Search>
 
             <!-- 新增和刷新 -->
-            <ListHeader @create="CreateHandler" @refresh="getData" />
+            <ListHeader layout="create,delete,refresh" @create="CreateHandler" @refresh="getData"
+                @delete="MultiDeleteHandler">
+                <el-button size="small" @click="MultiStatusChangeHandler(1)" v-if="searchForm.tab == 'all' || searchForm.tab == 'off'">上架</el-button>
+                <el-button size="small" @click="MultiStatusChangeHandler(0)" v-if="searchForm.tab == 'all' || searchForm.tab == 'saling'">下架</el-button>
+            </ListHeader>
 
             <!-- 資料 -->
-            <el-table :data="tableData" stripe style="width: 100%" v-loading="loading">
+            <el-table ref="multipleTableRef" @selection-change="SelectionChangeHandler" :data="tableData" stripe
+                style="width: 100%" v-loading="loading">
+                <el-table-column type="selection" width="55" />
                 <el-table-column label="商品" width="300">
                     <template #default="{ row }">
                         <div class="d-flex">
@@ -140,7 +163,7 @@ fetchCategoryList()
                 <el-table-column prop="create_time" label="商品狀態" width="100">
                     <template #default="{ row }">
                         <el-tag :type="row.status ? 'success' : 'danger'" size="small">
-                            {{ row.status ? '上架' : '下架' }}
+                            {{ row.status ? '上架' : '倉庫' }}
                         </el-tag>
                     </template>
                 </el-table-column>
@@ -160,8 +183,9 @@ fetchCategoryList()
                         <div v-if="searchForm.tab != 'delete'">
                             <el-button text type="primary" size="small" @click="UpdateHanlder(scope.row)">修改</el-button>
                             <el-button text type="primary" size="small">商品規格</el-button>
-                            <el-button text type="primary" size="small">設置輪播圖 </el-button>
-                            <el-button text type="primary" size="small">商品詳情</el-button>
+                            <el-button text :type="scope.row.goods_banner.length == 0 ? 'danger' : 'primary'" size="small" @click="SetGoodsBannersHandler(scope.row)" :loading="scope.row.bannersLoading">設置輪播圖 </el-button>
+                            <el-button text :type="scope.row.content ? 'danger' : 'primary'" size="small" @click="SetGoodsContentHandler(scope.row)" 
+                            :loading="scope.row.contentLoading">商品詳情</el-button>
 
                             <el-popconfirm title="是否要刪除" confirmButtonText="確認" cancelButtonText="取消"
                                 @confirm="DeleteHanlder(scope.row.id)">
@@ -185,33 +209,74 @@ fetchCategoryList()
             <FormDrawer ref="formDrawerRef" :title="drawerTitle" @submitHandler="SubmitHandler">
                 <el-form :model="form" ref="formRef" label-width="100px" :inline="false">
 
-                    <el-form-item label="管理員名稱" prop="username">
-                        <el-input v-model="form.username" placeholder="管理員名稱"></el-input>
+                    <el-form-item label="商品名稱" prop="title">
+                        <el-input v-model="form.title" placeholder="商品名稱"></el-input>
                     </el-form-item>
 
-                    <el-form-item label="密碼" prop="password">
-                        <el-input v-model="form.password" placeholder="密碼"></el-input>
+                    <el-form-item label="封面" prop="cover">
+                        <ChooseImage v-model="form.cover" />
                     </el-form-item>
 
-                    <el-form-item label="大頭貼" prop="avatar">
-                        <ChooseImage v-model="form.avatar" />
-                    </el-form-item>
-
-                    <el-form-item label="所屬角色" prop="role_id">
-                        <el-select v-model="form.role_id" placeholder="請選擇所屬角色">
-                            <el-option v-for="item of roles" :key="item.id" :label="item.name" :value="item.id">
+                    <el-form-item label="商品分類" prop="category_id">
+                        <el-select v-model="form.category_id" placeholder="請選擇商品分類">
+                            <el-option v-for="item of category_list" :key="item.id" :label="item.name" :value="item.id">
                             </el-option>
                         </el-select>
-
                     </el-form-item>
 
-                    <el-form-item label="狀態" prop="status">
-                        <el-switch v-model="form.status" :active-value="1" :inactive-value="0">
-                        </el-switch>
+                    <el-form-item label="商品描述" prop="desc">
+                        <el-input type="textarea" v-model="form.desc" placeholder="請輸入商品描述"></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="單位" prop="unit">
+                        <el-input v-model="form.unit" placeholder="請輸入單位"></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="總庫存" prop="stock">
+                        <el-input type="number" v-model="form.stock">
+                            <template #append>件</template>
+                        </el-input>
+                    </el-form-item>
+
+                    <el-form-item label="庫存預警" prop="min_stock">
+                        <el-input type="number" v-model="form.min_stock">
+                            <template #append>件</template>
+                        </el-input>
+                    </el-form-item>
+
+                    <el-form-item label="最低銷售價格" prop="min_price">
+                        <el-input type="number" v-model="form.min_price">
+                            <template #append>元</template>
+                        </el-input>
+                    </el-form-item>
+
+                    <el-form-item label="最低價格" prop="min_oprice">
+                        <el-input type="number" v-model="form.min_oprice">
+                            <template #append>元</template>
+                        </el-input>
+                    </el-form-item>
+
+                    <el-form-item label="庫存顯示" prop="stock_display">
+                        <el-radio-group v-model="form.stock_display">
+                            <el-radio :value="0">隱藏</el-radio>
+                            <el-radio :value="1">顯示</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+
+                    <el-form-item label="是否上架" prop="status">
+                        <el-radio-group v-model="form.status">
+                            <el-radio :value="0">放入庫存</el-radio>
+                            <el-radio :value="1">立即上架</el-radio>
+                        </el-radio-group>
                     </el-form-item>
                 </el-form>
             </FormDrawer>
         </el-card>
+
+        <!-- 設置輪播圖 -->
+        <Banners ref="bannersRef" @reload-data="getData" />
+        <!-- 商品詳情 -->
+        <Content ref="contentRef" @reload-data="getData" />
     </div>
 </template>
 

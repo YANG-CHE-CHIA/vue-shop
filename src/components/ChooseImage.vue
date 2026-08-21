@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { toast } from '@/composables/util.js'
 import ImageAside from '@/components/ImageAside.vue'
 import ImageMain from '@/components/ImageMain.vue'
 
@@ -25,7 +26,11 @@ const openHandler = () => dialogVisible.value = true
 const closeHandler = () =>  dialogVisible.value = false
 
 const props = defineProps({
-    modelValue:[String,Array]
+    modelValue:[String,Array],
+    limit:{
+        type:Number,
+        default:1
+    }
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -36,10 +41,25 @@ const ChooseHandler = (item) => {
 }
 
 const submitHandler = () => {
+    let value = []
+    if(props.limit == 1){
+        value = urls[0]
+    }
+    else{
+        value = [...props.modelValue,...urls]
+        if(value.length > props.limit){
+            toast("最多還能選擇" + (props.limit - props.modelValue.length) + "張" , 'error');
+        }
+    }
+
     if(urls.length){
-        emit('update:modelValue',urls[0])
+        emit('update:modelValue',value)
     }
     closeHandler()
+}
+
+const removeImage = (url) => {
+    emit('update:modelValue',props.modelValue.filter(u => u != url))
 }
 
 </script>
@@ -47,8 +67,13 @@ const submitHandler = () => {
 <template>
 
     <div v-if="modelValue" class="d-flex">
-        <el-image :src="modelValue" fit="cover" class="img"></el-image>
-        
+        <el-image v-if="typeof modelValue == 'string'" :src="modelValue" fit="cover" class="img"></el-image>
+        <div class="img-flex" v-else>
+            <div class="img_item" v-for="(url,index) of modelValue" :key="index">
+                <el-icon class="close" @click="removeImage(url)"><CircleClose /></el-icon>
+                <el-image :src="url" fit="cover" class="img"></el-image>
+            </div>
+        </div>
     </div>
 
     <div class="choose_btn" @click="openHandler">
@@ -64,7 +89,7 @@ const submitHandler = () => {
             </el-header>
             <el-container>
                 <ImageAside ref="ImageAsideRef" @change="AsideChangeHandler" />
-                <ImageMain openChoose ref="ImageMainRef" @choose="ChooseHandler" />
+                <ImageMain :limit="limit" openChoose ref="ImageMainRef" @choose="ChooseHandler" />
             </el-container>
         </el-container>
         <template #footer>
@@ -112,5 +137,29 @@ const submitHandler = () => {
     border-radius: 10px;
     border: 1px solid #dddddd;
     margin-right: 10px;
+}
+
+.img-flex{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.img_item{
+    width: 100px;
+    height: 100px;
+    position: relative;
+    margin: 0 5px;
+    margin-bottom: 10px;
+}
+
+.img_item .close{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+    z-index: 10;
+    background: #ffffff;
+    border-radius: 50px;
 }
 </style>

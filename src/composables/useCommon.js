@@ -112,8 +112,26 @@ export function useInitTable(opt = {}) {
         }
     }
 
+    //批量修改狀態
+    const MultiStatusChangeHandler = async (status) => {
+        loading.value = true
+        try {
+            await opt.updateStatus(multiSelectionsIds.value,status)
+            toast("修改狀態成功", "success")
+            if (multipleTableRef.value) {
+                multipleTableRef.value.clearSelection()
+            }
+            getData()
 
-    return { searchForm, resetSearchFrom, tableData, loading, currentPage, total, limit, getData, DeleteHanlder, StatusChangeHandler, SelectionChangeHandler, multipleTableRef, MultiDeleteHandler }
+        } catch (error) {
+            console.error('發生錯誤：', error);
+        }
+        finally {
+            loading.value = false
+        }
+    }
+
+    return { searchForm, resetSearchFrom, tableData, loading, currentPage, total, limit, getData, DeleteHanlder, StatusChangeHandler, SelectionChangeHandler, multipleTableRef, MultiDeleteHandler, MultiStatusChangeHandler }
 }
 
 // 封裝新增,修改

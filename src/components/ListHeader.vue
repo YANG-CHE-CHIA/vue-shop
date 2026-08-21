@@ -22,6 +22,7 @@ defineEmits(['create', 'refresh', 'delete'])
                     <el-button type="danger" size="small">批量刪除</el-button>
                 </template>
             </el-popconfirm>
+            <slot/>
         </div>
         <el-tooltip effect="dark" content="刷新" placement="top">
             <el-button text @click="$emit('refresh')">

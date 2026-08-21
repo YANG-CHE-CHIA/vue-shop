@@ -91,10 +91,14 @@ const openUploadFile = () => drawer.value = true
 //上傳成功
 const UploadSuccessHandler = () => getData(1)
 
-defineProps({
+const props = defineProps({
     openChoose:{
         type:Boolean,
         default:false
+    },
+    limit:{
+        type:Number,
+        default:1
     }
 })
 
@@ -103,9 +107,9 @@ const emit = defineEmits(['choose'])
 const checkedImage = computed(()=> list.value.filter(o=>o.checked))
 
 const ChooseChangeHandler = (item) =>{
-    if(item.checked && checkedImage.value.length > 1){
+    if(item.checked && checkedImage.value.length > props.limit){
         item.checked = false
-        return toast('最多只可以選一張圖片','error')
+        return toast(`最多只可以選${props.limit}張圖片`,'error')
     }
     emit('choose',checkedImage.value)
 }
