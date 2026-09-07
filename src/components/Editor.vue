@@ -2,12 +2,8 @@
 import tinymce from 'tinymce';
 import Editor from '@tinymce/tinymce-vue';
 import { ref, watch } from 'vue';
-
-// 核心資源（TinyMCE 5 不包含 models/dom）
 import 'tinymce/themes/silver';
 import 'tinymce/icons/default';
-
-// 外掛引入（TinyMCE 5 原生支援 template）
 import 'tinymce/plugins/advlist';
 import 'tinymce/plugins/anchor';
 import 'tinymce/plugins/autolink';
@@ -38,6 +34,7 @@ import 'tinymce/plugins/template';
 import 'tinymce/plugins/visualblocks';
 import 'tinymce/plugins/visualchars';
 import 'tinymce/plugins/wordcount';
+import ChooseImage from '@/components/ChooseImage.vue';
 
 // v-model 定義
 const props = defineProps({
@@ -46,6 +43,8 @@ const props = defineProps({
     default: ''
   }
 });
+
+const ChooseImageRef = ref(null);
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -63,7 +62,7 @@ const init = {
   plugins:
     'wordcount visualchars visualblocks template searchreplace save quickbars preview pagebreak nonbreaking media insertdatetime importcss image help fullscreen directionality codesample code charmap link table lists advlist anchor autolink autoresize autosave emoticons',
   toolbar:
-    'undo redo | fontsizeselect fontselect | formats | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table link image media template | removeformat fullscreen help',
+    'undo redo | fontsizeselect fontselect | formats | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table link imageUpload media template | removeformat fullscreen help ',
   content_style: 'p { margin: 5px 0; font-size: 14px; }',
   fontsize_formats: '12px 14px 16px 18px 24px 36px 48px 56px 72px',
   font_formats:
@@ -76,7 +75,20 @@ const init = {
   branding: false,
   elementpath: false,
   resize: false,
-  statusbar: false
+  statusbar: false,
+  setup: (editor) => {
+    editor.ui.registry.addButton("imageUpload",{
+      tooltip: "上傳圖片",
+      icon: "image",
+      onAction: () => {
+        ChooseImageRef.value.openHandler((data)=>{
+          data.forEach(url =>{
+            editor.insertContent(`<img src="${url}" alt="圖片" />`);
+          })
+        });
+      }
+    })
+  }
 };
 
 // 雙向綁定處理
@@ -98,6 +110,7 @@ watch(content, (newVal) => {
 
 <template>
   <editor v-model="content" tag-name="div" :init="init" />
+  <ChooseImage :preview="false" ref="ChooseImageRef" :limit="9" />
 </template>
 
 <style>

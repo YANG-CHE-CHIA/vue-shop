@@ -43,3 +43,18 @@ export function showPrompt(tip,value = '') {
     inputValue:value
   })
 }
+
+//排序上移
+export function useArrayMoveUp(arr,index){
+  swapArray(arr,index,index - 1 )
+}
+
+//排序下移
+export function useArrayMoveDown(arr,index){
+  swapArray(arr,index,index + 1 )
+}
+
+function swapArray(arr,before_index,after_index){
+  arr[before_index] = arr.splice(after_index,1,arr[before_index])[0]
+  return arr
+}

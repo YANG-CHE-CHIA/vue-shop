@@ -21,7 +21,12 @@ const OpenUploadHandler = () =>{
     ImageMainRef.value.openUploadFile()
 }
 
-const openHandler = () => dialogVisible.value = true
+const callbackFunction = ref(null)
+
+const openHandler = (callback = null) => {
+    callbackFunction.value = callback
+    dialogVisible.value = true
+}
 
 const closeHandler = () =>  dialogVisible.value = false
 
@@ -30,6 +35,10 @@ const props = defineProps({
     limit:{
         type:Number,
         default:1
+    },
+    preview:{
+        type:Boolean,
+        default:true
     }
 })
 
@@ -46,15 +55,21 @@ const submitHandler = () => {
         value = urls[0]
     }
     else{
-        value = [...props.modelValue,...urls]
+        value = props.preview ? [...props.modelValue,...urls] : [...urls]
         if(value.length > props.limit){
-            toast("最多還能選擇" + (props.limit - props.modelValue.length) + "張" , 'error');
+            let limit = prop.preview ? (props.limit - props.modelValue.length) : props.limit
+            toast("最多還能選擇" + limit + "張" , 'error');
         }
     }
 
-    if(urls.length){
+    if(value && props.preview){
         emit('update:modelValue',value)
     }
+
+    if(!props.preview && typeof callbackFunction.value === 'function'){
+        callbackFunction.value(value)
+    }
+
     closeHandler()
 }
 
@@ -62,11 +77,15 @@ const removeImage = (url) => {
     emit('update:modelValue',props.modelValue.filter(u => u != url))
 }
 
+defineExpose({
+    openHandler
+})
+
 </script>
 
 <template>
 
-    <div v-if="modelValue" class="d-flex">
+    <div v-if="modelValue && preview" class="d-flex">
         <el-image v-if="typeof modelValue == 'string'" :src="modelValue" fit="cover" class="img"></el-image>
         <div class="img-flex" v-else>
             <div class="img_item" v-for="(url,index) of modelValue" :key="index">
@@ -76,7 +95,7 @@ const removeImage = (url) => {
         </div>
     </div>
 
-    <div class="choose_btn" @click="openHandler">
+    <div v-if="preview" class="choose_btn" @click="openHandler">
         <el-icon :size="25">
             <Plus />
         </el-icon>

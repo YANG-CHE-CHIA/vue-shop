@@ -10,6 +10,7 @@ import SearchItem from '@/components/SearchItem.vue'
 import ListHeader from '@/components/ListHeader.vue'
 import Banners from './banners.vue'
 import Content from './content.vue'
+import Skus from './skus.vue'
 
 const { searchForm, resetSearchFrom, tableData, loading, currentPage, total, limit, getData, DeleteHanlder, 
     SelectionChangeHandler, multipleTableRef, MultiDeleteHandler, MultiStatusChangeHandler }
@@ -24,6 +25,7 @@ const { searchForm, resetSearchFrom, tableData, loading, currentPage, total, lim
             tableData.value = res.list.map(o => {
                 o.bannersLoading = false
                 o.contentLoading = false
+                o.skusLoading = false
                 return o
             })
             total.value = res.totalCount
@@ -107,6 +109,12 @@ const SetGoodsContentHandler = (item) =>{
     contentRef.value.open(item)
 }
 
+//商品規格
+const skusRef = ref(null)
+const SetGoodsSkusHandler = (item) =>{
+    skusRef.value.open(item)
+}
+
 </script>
 
 <template>
@@ -182,8 +190,8 @@ const SetGoodsContentHandler = (item) =>{
                     <template #default="scope">
                         <div v-if="searchForm.tab != 'delete'">
                             <el-button text type="primary" size="small" @click="UpdateHanlder(scope.row)">修改</el-button>
-                            <el-button text type="primary" size="small">商品規格</el-button>
-                            <el-button text :type="scope.row.goods_banner.length == 0 ? 'danger' : 'primary'" size="small" @click="SetGoodsBannersHandler(scope.row)" :loading="scope.row.bannersLoading">設置輪播圖 </el-button>
+                            <el-button text type="primary" size="small" @click="SetGoodsSkusHandler(scope.row)" :loading="scope.row.skusLoading">商品規格</el-button>
+                            <el-button text :type="scope.row.goods_banner.length == 0 ? 'danger' : 'primary'" size="small" @click="SetGoodsBannersHandler(scope.row)" :loading="scope.row.bannersLoading">設置輪播圖</el-button>
                             <el-button text :type="scope.row.content ? 'danger' : 'primary'" size="small" @click="SetGoodsContentHandler(scope.row)" 
                             :loading="scope.row.contentLoading">商品詳情</el-button>
 
@@ -277,6 +285,8 @@ const SetGoodsContentHandler = (item) =>{
         <Banners ref="bannersRef" @reload-data="getData" />
         <!-- 商品詳情 -->
         <Content ref="contentRef" @reload-data="getData" />
+        <!-- 商品規格 -->
+        <Skus ref="skusRef" @reload-data="getData" />
     </div>
 </template>
 
