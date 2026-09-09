@@ -12,4 +12,3 @@ export function deleteSkus(ids) {
 }
 
 export const updateSkusStatus = (id,status) => axios.post(`/admin/skus/${id}/update_status`,{ status });
-

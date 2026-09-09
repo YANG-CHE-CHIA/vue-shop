@@ -131,7 +131,7 @@ export function useInitTable(opt = {}) {
         }
     }
 
-    return { searchForm, resetSearchFrom, tableData, loading, currentPage, total, limit, getData, DeleteHanlder, StatusChangeHandler, SelectionChangeHandler, multipleTableRef, MultiDeleteHandler, MultiStatusChangeHandler }
+    return { searchForm, resetSearchFrom, tableData, loading, currentPage, total, limit, getData, DeleteHanlder, StatusChangeHandler, SelectionChangeHandler, multipleTableRef, MultiDeleteHandler, MultiStatusChangeHandler, multiSelectionsIds }
 }
 
 // 封裝新增,修改

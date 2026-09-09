@@ -1,6 +1,19 @@
 <script setup>
+import { ref } from 'vue'
 import SkuCardItem from './SkuCardItem.vue'
-import { sku_card_list, btnLoading, addSkuCardEvent, UpdateHandler, DeleteHandler, bodyLoading, sortCard } from '@/composables/useSku.js'
+import { sku_card_list, btnLoading, addSkuCardEvent, UpdateHandler, DeleteHandler, bodyLoading, sortCard, ChooseSetGoodsSkusCardHandler } from '@/composables/useSku.js'
+import ChooseSku from '@/components/ChooseSku.vue'
+
+const ChooseSkuRef = ref(null)
+
+const ChooseSkuHandler = (item) =>{
+    ChooseSkuRef.value.open((v)=>{
+        ChooseSetGoodsSkusCardHandler(item.id,{
+            name:v.name,
+            value:v.list
+        })
+    })
+}
 </script>
 
 <template>
@@ -11,7 +24,7 @@ import { sku_card_list, btnLoading, addSkuCardEvent, UpdateHandler, DeleteHandle
                     <el-input v-model="item.text" placeholder="規格名稱" style="width: 200px;"
                         @change="UpdateHandler(item)">
                         <template #append>
-                            <el-icon>
+                            <el-icon class="cursor-pointer" @click="ChooseSkuHandler(item)">
                                 <more />
                             </el-icon>
                         </template>
@@ -44,11 +57,12 @@ import { sku_card_list, btnLoading, addSkuCardEvent, UpdateHandler, DeleteHandle
             <SkuCardItem :skuCardId="item.id" />
         </el-card>
         <el-button type="success" size="small" :loading="btnLoading" @click="addSkuCardEvent">新增規格</el-button>
-
     </el-form-item>
+
+    <ChooseSku ref="ChooseSkuRef" />
 </template>
 
-<style>
+<style scoped>
 .title_item {
     display: flex;
     justify-content: space-between;

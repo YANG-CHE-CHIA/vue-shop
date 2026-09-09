@@ -22,7 +22,7 @@ const { item, inputValue, inputVisible, InputRef, handleClose, showInput, handle
     </div>
 </template>
 
-<style>
+<style scoped>
 .el-tag.is-closable{
     margin-right: 10px;
     width: 12%;

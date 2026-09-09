@@ -2,9 +2,10 @@
 import { ref, reactive } from 'vue'
 import { readGoods, updateGoods, updateGoodsSkus } from '@/api/goods.js'
 import { toast } from '@/composables/util.js'
+import { goodsId, initSkuCardList, sku_list } from '@/composables/useSku.js'
 import FormDrawer from '@/components/FormDrawer.vue'
 import SkuCard from './components/SkuCard.vue'
-import { goodsId, initSkuCardList } from '@/composables/useSku.js'
+import SkuTable from './components/SkuTable.vue'
 
 const formDrawerRef = ref(null)
 
@@ -48,8 +49,17 @@ const open = async (item) => {
 const emit = defineEmits(['reloadData'])
 const SubmitHandler = async () => {
     formDrawerRef.value.showLoading();
+    let data = {
+        sku_type:form.sku_type,
+        sku_value:form.sku_value
+    }
+
+    if(form.sku_type == 1){
+        data.goodsSkus = sku_list.value
+    }
+
     try {
-        await updateGoodsSkus(goodsId.value, form)
+        await updateGoodsSkus(goodsId.value, data)
         toast("設置商品規格成功", 'success');
         formDrawerRef.value.close()
         emit('reloadData')
@@ -106,6 +116,7 @@ defineExpose({
             </template>
             <template v-else>
                 <SkuCard />
+                <SkuTable />
             </template>
         </el-form>
     </FormDrawer>

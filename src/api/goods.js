@@ -15,6 +15,12 @@ export const updateGoods = (id,data) => axios.post(`/admin/goods/${id}`,data);
 //刪除
 export const deleteGoods = (ids) => axios.post(`/admin/goods/delete_all`, { ids });
 
+//徹底刪除的商品
+export const destroyGoods = (ids) => axios.post(`/admin/goods/destroy`, { ids });
+
+//批量恢復刪除的商品
+export const restoreGoods = (ids) => axios.post(`/admin/goods/restore`, { ids });
+
 //讀取資料
 export const readGoods = (id) => axios.get(`/admin/goods/read/${id}`);
 
@@ -44,6 +50,9 @@ export const updateGoodsSkusCardValue = (id,data) => axios.post(`/admin/goods_sk
 
 //刪除商品選項規格的值
 export const deleteGoodsSkusCardValue = (id) => axios.post(`/admin/goods_skus_card_value/${id}/delete`);
+
+//選擇設置商品規格選項和值
+export const chooseAndSetGoodsSkusCard = (id,data) => axios.post(`/admin/goods_skus_card/${id}/set`,data)
 
 
 

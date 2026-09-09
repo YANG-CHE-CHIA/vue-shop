@@ -1,8 +1,9 @@
 <script setup>
 import { ref } from 'vue'
-import { getGoodsList, updateGoodsStatus, createGoods, updateGoods, deleteGoods } from '@/api/goods.js'
+import { getGoodsList, updateGoodsStatus, createGoods, updateGoods, deleteGoods, restoreGoods, destroyGoods } from '@/api/goods.js'
 import { getCategoryList } from '@/api/category.js'
 import { useInitTable, useInitForm } from '@/composables/useCommon.js'
+import { toast } from '@/composables/util.js'
 import FormDrawer from '@/components/FormDrawer.vue'
 import ChooseImage from '@/components/ChooseImage.vue'
 import Search from '@/components/Search.vue'
@@ -12,8 +13,8 @@ import Banners from './banners.vue'
 import Content from './content.vue'
 import Skus from './skus.vue'
 
-const { searchForm, resetSearchFrom, tableData, loading, currentPage, total, limit, getData, DeleteHanlder, 
-    SelectionChangeHandler, multipleTableRef, MultiDeleteHandler, MultiStatusChangeHandler }
+const { searchForm, resetSearchFrom, tableData, loading, currentPage, total, limit, getData, DeleteHanlder,
+    SelectionChangeHandler, multipleTableRef, MultiDeleteHandler, MultiStatusChangeHandler, multiSelectionsIds }
     = useInitTable({
         searchForm: {
             title: '',
@@ -99,21 +100,51 @@ fetchCategoryList()
 
 //設置輪播圖
 const bannersRef = ref(null)
-const SetGoodsBannersHandler = (item) =>{
+const SetGoodsBannersHandler = (item) => {
     bannersRef.value.open(item)
 }
 
 //商品詳情
 const contentRef = ref(null)
-const SetGoodsContentHandler = (item) =>{
+const SetGoodsContentHandler = (item) => {
     contentRef.value.open(item)
 }
 
 //商品規格
 const skusRef = ref(null)
-const SetGoodsSkusHandler = (item) =>{
+const SetGoodsSkusHandler = (item) => {
     skusRef.value.open(item)
 }
+
+//恢復商品
+const RestoreGoodsHandler = async () => {
+    useMultiAction(restoreGoods,"恢復")
+}
+
+//徹底刪除商品
+const DestoryGoodsHandler = async () => {
+    useMultiAction(destroyGoods,"徹底刪除")
+}
+
+//恢復商品和徹底刪除商品共用方法
+async function useMultiAction (func,msg)  {
+    loading.value = true
+    try {
+        await func(multiSelectionsIds.value)
+        toast(msg + "成功", "success")
+        if (multipleTableRef.value) {
+            multipleTableRef.value.clearSelection()
+        }
+        getData()
+    }
+    catch (error) {
+        console.error('刪除失敗：', error)
+    }
+    finally {
+        loading.value = false
+    }
+}
+
 
 </script>
 
@@ -140,10 +171,20 @@ const SetGoodsSkusHandler = (item) =>{
             </Search>
 
             <!-- 新增和刷新 -->
-            <ListHeader layout="create,delete,refresh" @create="CreateHandler" @refresh="getData"
-                @delete="MultiDeleteHandler">
-                <el-button size="small" @click="MultiStatusChangeHandler(1)" v-if="searchForm.tab == 'all' || searchForm.tab == 'off'">上架</el-button>
-                <el-button size="small" @click="MultiStatusChangeHandler(0)" v-if="searchForm.tab == 'all' || searchForm.tab == 'saling'">下架</el-button>
+            <ListHeader layout="create,refresh" @create="CreateHandler" @refresh="getData">
+                <el-button type="danger" size="small" @click="MultiDeleteHandler"
+                    v-if="searchForm.tab != 'delete'">批量刪除</el-button>
+                <el-button type="warning" size="small" @click="RestoreGoodsHandler" v-else>恢復商品</el-button>
+                <el-popconfirm v-if="searchForm.tab == 'delete'" title="是否要徹底刪除" confirmButtonText="確認"
+                    cancelButtonText="取消" @confirm="DestoryGoodsHandler">
+                    <template #reference>
+                        <el-button type="danger" size="small">徹底刪除</el-button>
+                    </template>
+                </el-popconfirm>
+                <el-button size="small" @click="MultiStatusChangeHandler(1)"
+                    v-if="searchForm.tab == 'all' || searchForm.tab == 'off'">上架</el-button>
+                <el-button size="small" @click="MultiStatusChangeHandler(0)"
+                    v-if="searchForm.tab == 'all' || searchForm.tab == 'saling'">下架</el-button>
             </ListHeader>
 
             <!-- 資料 -->
@@ -190,13 +231,19 @@ const SetGoodsSkusHandler = (item) =>{
                     <template #default="scope">
                         <div v-if="searchForm.tab != 'delete'">
                             <el-button text type="primary" size="small" @click="UpdateHanlder(scope.row)">修改</el-button>
-                            <el-button text type="primary" size="small" @click="SetGoodsSkusHandler(scope.row)" :loading="scope.row.skusLoading">商品規格</el-button>
-                            <el-button text :type="scope.row.goods_banner.length == 0 ? 'danger' : 'primary'" size="small" @click="SetGoodsBannersHandler(scope.row)" :loading="scope.row.bannersLoading">設置輪播圖</el-button>
-                            <el-button text :type="scope.row.content ? 'danger' : 'primary'" size="small" @click="SetGoodsContentHandler(scope.row)" 
-                            :loading="scope.row.contentLoading">商品詳情</el-button>
+                            <el-button text
+                                :type="(scope.row.sku_type == 0 && !scope.row.sku_value) || (scope.row.sku_type == 1 && !scope.row.goods_skus_length) ? 'danger' : 'primary'"
+                                size="small" @click="SetGoodsSkusHandler(scope.row)"
+                                :loading="scope.row.skusLoading">商品規格</el-button>
+                            <el-button text :type="scope.row.goods_banner.length == 0 ? 'danger' : 'primary'"
+                                size="small" @click="SetGoodsBannersHandler(scope.row)"
+                                :loading="scope.row.bannersLoading">設置輪播圖</el-button>
+                            <el-button text :type="scope.row.content ? 'danger' : 'primary'" size="small"
+                                @click="SetGoodsContentHandler(scope.row)"
+                                :loading="scope.row.contentLoading">商品詳情</el-button>
 
                             <el-popconfirm title="是否要刪除" confirmButtonText="確認" cancelButtonText="取消"
-                                @confirm="DeleteHanlder(scope.row.id)">
+                                @confirm="DeleteHanlder([scope.row.id])">
                                 <template #reference>
                                     <el-button text type="primary" size="small">刪除</el-button>
                                 </template>

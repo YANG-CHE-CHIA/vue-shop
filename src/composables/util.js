@@ -58,3 +58,18 @@ function swapArray(arr,before_index,after_index){
   arr[before_index] = arr.splice(after_index,1,arr[before_index])[0]
   return arr
 }
+
+//sku排列算法
+export function cartesianProductOf(){
+  return Array.prototype.reduce.call(arguments, function (a, b) {
+    var ret = [];
+    a.forEach(function (a) {
+      b.forEach(function (b) {
+        ret.push(a.concat([b]));
+      });
+    });
+    return ret;
+  },[
+    []
+  ]);
+}
