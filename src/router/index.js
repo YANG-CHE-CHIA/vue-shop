@@ -110,6 +110,13 @@ const asyncRoutes = [
     component: () => import('@/pages/skus/list.vue'),
     meta: { title: "規格管理" }
   }
+  ,
+  {
+    path: '/level/list',
+    name: 'Level',
+    component: () => import('@/pages/level/list.vue'),
+    meta: { title: "會員等級" }
+  }
 ]
 
 export const router = createRouter({
