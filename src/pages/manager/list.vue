@@ -78,7 +78,7 @@ const roles = ref([])
                     {{ row.role ? row.role.name : "-" }}
                 </template>
             </el-table-column>
-            <el-table-column prop="create_time" label="狀態" width="120">
+            <el-table-column label="狀態" width="120">
                 <template #default="{ row }">
                     <el-switch :modelValue="row.status" :active-value="1" :inactive-value="0"
                         @change="StatusChangeHandler($event, row)" :loading="row.statusLoading"
