@@ -22,7 +22,7 @@ error => {
 
 service.interceptors.response.use(response => {
     errorMessage.value = ''
-    return response.data.data
+    return response.request.responseType == 'blob' ? response.data : response.data.data
 }, 
 error => {
     const msg = error?.response?.data?.msg || '請求失敗'
