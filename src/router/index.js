@@ -79,6 +79,18 @@ const asyncRoutes = [
     meta: { title: "配置列表" }
   },
   {
+    path: '/setting/buy',
+    name: 'SettingBuy',
+    component: () => import('@/pages/setting/buy.vue'),
+    meta: { title: "支付設置" }
+  },
+  {
+    path: '/setting/ship',
+    name: 'SettingShip',
+    component: () => import('@/pages/setting/ship.vue'),
+    meta: { title: "物流設置" }
+  },
+  {
     path: '/coupon/list',
     name: 'CouponList',
     component: () => import('@/pages/coupon/list.vue'),
