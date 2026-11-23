@@ -129,6 +129,19 @@ const asyncRoutes = [
     component: () => import('@/pages/level/list.vue'),
     meta: { title: "會員等級" }
   }
+  ,
+  {
+    path: '/distribution/index',
+    name: 'DistributionIndex',
+    component: () => import('@/pages/distribution/index.vue'),
+    meta: { title: "分銷員管理" }
+  },
+  {
+    path: '/distribution/setting',
+    name: 'DistributionSetting',
+    component: () => import('@/pages/distribution/setting.vue'),
+    meta: { title: "分銷設置" }
+  }
 ]
 
 export const router = createRouter({
