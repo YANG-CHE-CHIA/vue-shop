@@ -7,8 +7,8 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  // 替換成你的 GitHub Repository 名稱
-  base: '/vue-shop/',
+  // GitHub Actions 建置時用 '/vue-shop/'，Vercel 與本機預設用 '/'
+  base: process.env.GITHUB_ACTIONS ? '/vue-shop/' : '/',
   plugins: [
     vue(),
     vueDevTools(),
